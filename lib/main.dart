@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -113,9 +114,51 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             Expanded(
                                 flex: 5,
-                                child: Container(
-                                  color: Colors.amber,
-                                )),
+                                child: SfCartesianChart(
+                                  // Initialize category axis
+                                    primaryXAxis: CategoryAxis(),
+                                    tooltipBehavior:
+                                    TooltipBehavior(enable: true),
+
+                                    /// To set the track ball as true and customized trackball behaviour.
+                                    trackballBehavior: TrackballBehavior(
+                                      enable: true,
+                                      markerSettings: TrackballMarkerSettings(
+                                        markerVisibility:
+                                        TrackballVisibilityMode.visible,
+                                        height: 10,
+                                        width: 10,
+                                        borderWidth: 1,
+                                      ),
+                                      activationMode: ActivationMode.singleTap,
+                                      tooltipDisplayMode:
+                                      TrackballDisplayMode.floatAllPoints,
+                                      tooltipSettings: InteractiveTooltip(
+                                        format:
+                                        TrackballDisplayMode.floatAllPoints !=
+                                            TrackballDisplayMode
+                                                .groupAllPoints
+                                            ? 'series.name : point.y'
+                                            : null,
+                                      ),
+                                    ),
+                                    series: <SplineSeries<SalesData, String>>[
+                                      SplineSeries<SalesData, String>(
+                                        // Bind data source
+                                          dataSource: <SalesData>[
+                                            SalesData('Jan', 35),
+                                            SalesData('Feb', 28),
+                                            SalesData('Mar', 34),
+                                            SalesData('Apr', 32),
+                                            SalesData('May', 40)
+                                          ],
+                                          xValueMapper: (SalesData sales, _) =>
+                                          sales.year,
+                                          yValueMapper: (SalesData sales, _) =>
+                                          sales.sales, // Enable data label
+                                          dataLabelSettings:
+                                          DataLabelSettings(isVisible: true))
+                                    ]),),
                           ],
                         ),
                       ),
