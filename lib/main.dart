@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+
+import 'conpoments/graph.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,6 +50,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -113,52 +119,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                             Expanded(
-                                flex: 5,
-                                child: SfCartesianChart(
-                                  // Initialize category axis
-                                    primaryXAxis: CategoryAxis(),
-                                    tooltipBehavior:
-                                    TooltipBehavior(enable: true),
-
-                                    /// To set the track ball as true and customized trackball behaviour.
-                                    trackballBehavior: TrackballBehavior(
-                                      enable: true,
-                                      markerSettings: TrackballMarkerSettings(
-                                        markerVisibility:
-                                        TrackballVisibilityMode.visible,
-                                        height: 10,
-                                        width: 10,
-                                        borderWidth: 1,
-                                      ),
-                                      activationMode: ActivationMode.singleTap,
-                                      tooltipDisplayMode:
-                                      TrackballDisplayMode.floatAllPoints,
-                                      tooltipSettings: InteractiveTooltip(
-                                        format:
-                                        TrackballDisplayMode.floatAllPoints !=
-                                            TrackballDisplayMode
-                                                .groupAllPoints
-                                            ? 'series.name : point.y'
-                                            : null,
-                                      ),
-                                    ),
-                                    series: <SplineSeries<SalesData, String>>[
-                                      SplineSeries<SalesData, String>(
-                                        // Bind data source
-                                          dataSource: <SalesData>[
-                                            SalesData('Jan', 35),
-                                            SalesData('Feb', 28),
-                                            SalesData('Mar', 34),
-                                            SalesData('Apr', 32),
-                                            SalesData('May', 40)
-                                          ],
-                                          xValueMapper: (SalesData sales, _) =>
-                                          sales.year,
-                                          yValueMapper: (SalesData sales, _) =>
-                                          sales.sales, // Enable data label
-                                          dataLabelSettings:
-                                          DataLabelSettings(isVisible: true))
-                                    ]),),
+                              flex: 5,
+                              child: Graph(),
+                            ),
                           ],
                         ),
                       ),
@@ -250,12 +213,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-}
-
-class SalesData {
-  SalesData(this.year, this.sales);
-  final String year;
-  final double sales;
 }
 
 class SideMenu extends StatelessWidget {
