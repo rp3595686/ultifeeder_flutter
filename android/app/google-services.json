@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "963699063042",
+    "firebase_url": "https://fyp-v1-b47cd-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "fyp-v1-b47cd",
+    "storage_bucket": "fyp-v1-b47cd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963699063042:android:8d675ba88284ba62ef2a1b",
+        "android_client_info": {
+          "package_name": "com.example.utifeeder_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "963699063042-cpuhh6d2ngr0usnrd7du0j7dsp514vku.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA3DOy9r6OeC_7djYMq3pdtgK1ceGb2is"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "963699063042-cpuhh6d2ngr0usnrd7du0j7dsp514vku.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "963699063042-03dbh8jk0ir0g248lnq3kneq8qd775e5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.utifeederFlutter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

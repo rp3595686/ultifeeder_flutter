@@ -1,9 +1,19 @@
+import 'dart:convert';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'conpoments/graph.dart';
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+var firebaseDB;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  firebaseDB = FirebaseDatabase.instance;
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -50,9 +60,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String currentPHLevel = '0', currentTempLevel = '0';
+
   @override
   void initState() {
+    fetchData();
     super.initState();
+  }
+
+  fetchData() async {
+    final ref = firebaseDB.ref();
+    var snapshot_ph = await ref.child('ph/').get();
+    /*final jsonResponse = json.encode(snapshot_ph.value);
+    final jsonResponse = json.decode('{"test":"1"}');
+    print(json.encode(snapshot_ph.value[0]));*/
+    if (snapshot_ph.exists) {
+      final jsonResponse = json.encode(snapshot_ph.value);
+      final Response = json.decode(jsonResponse);
+      for (var i = 0; i < Response.length; i++) {
+        setState(() {
+          phGraphData.add(GraphData(
+              DateTime.parse(Response[i]['time']), Response[i]['value']));
+          if (i == Response.length - 1) {
+            currentPHLevel = Response[i]['value'].toString();
+          }
+        });
+      }
+    } else {
+      print('No data available.');
+    }
+
+    var snapshot_temp = await ref.child('temp/').get();
+    if (snapshot_temp.exists) {
+      final jsonResponse = json.encode(snapshot_temp.value);
+      final Response = json.decode(jsonResponse);
+      for (var i = 0; i < Response.length; i++) {
+        setState(() {
+          tempGraphData.add(GraphData(
+              DateTime.parse(Response[i]['time']), Response[i]['value']));
+          if (i == Response.length - 1) {
+            currentTempLevel = Response[i]['value'].toString();
+          }
+        });
+      }
+    } else {
+      print('No data available.');
+    }
   }
 
   @override
@@ -106,13 +159,51 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: Container(
-                                      color: Colors.red,
+                                    child: Card(
+                                      elevation: 5,
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Text(
+                                              ' pH Level:',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                                          Text(
+                                            currentPHLevel,
+                                            style: TextStyle(
+                                                fontSize: 36,
+                                                fontWeight: FontWeight.w900),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   Expanded(
-                                    child: Container(
-                                      color: Colors.purple,
+                                    child: Card(
+                                      elevation: 5,
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Text(
+                                              ' Temperature:',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                                          Text(
+                                            currentTempLevel,
+                                            style: TextStyle(
+                                                fontSize: 36,
+                                                fontWeight: FontWeight.w900),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -122,6 +213,22 @@ class _MyHomePageState extends State<MyHomePage> {
                               flex: 5,
                               child: Graph(),
                             ),
+                            Expanded(
+                                child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        phGraphData =
+                                            <GraphData>[]; //claer data in list
+                                        tempGraphData =
+                                            <GraphData>[]; //claer data in list
+
+                                        fetchData();
+                                      });
+                                    },
+                                    child: Icon(
+                                      Icons.refresh,
+                                      color: Colors.blue,
+                                    )))
                           ],
                         ),
                       ),

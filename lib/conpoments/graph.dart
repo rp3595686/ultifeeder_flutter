@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+List<GraphData> phGraphData = <GraphData>[];
+List<GraphData> tempGraphData = <GraphData>[];
+
 class Graph extends StatelessWidget {
   const Graph({
     Key? key,
@@ -8,22 +11,9 @@ class Graph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<GraphData> phGraphData = <GraphData>[
-      GraphData(DateTime(2015, 1, 1, 1), 35),
-      GraphData(DateTime(2015, 1, 1, 2), 28),
-      GraphData(DateTime(2015, 1, 1, 3), 34),
-      GraphData(DateTime(2015, 1, 1, 4), 32),
-      GraphData(DateTime(2015, 1, 1, 5), 40),
-    ];
-    final List<GraphData> tempGraphData = <GraphData>[
-      GraphData(DateTime(2015, 1, 1, 1), 20),
-      GraphData(DateTime(2015, 1, 1, 2), 28),
-      GraphData(DateTime(2015, 1, 1, 3), 40),
-      GraphData(DateTime(2015, 1, 1, 4), 32),
-      GraphData(DateTime(2015, 1, 1, 6), 21),
-    ];
-
-    return SfCartesianChart(
+    return Card(
+      elevation: 5,
+      child: SfCartesianChart(
         //title: ChartTitle(text: "test"),
         legend: Legend(
           isVisible: true,
@@ -44,11 +34,11 @@ class Graph extends StatelessWidget {
           activationMode: ActivationMode.singleTap,
           tooltipDisplayMode: TrackballDisplayMode.floatAllPoints,
           /*tooltipSettings: InteractiveTooltip(
-            format: TrackballDisplayMode.floatAllPoints !=
-                    TrackballDisplayMode.groupAllPoints
-                ? 'series.name : point.y'
-                : null,
-          ),*/
+              format: TrackballDisplayMode.floatAllPoints !=
+                      TrackballDisplayMode.groupAllPoints
+                  ? 'series.name : point.y'
+                  : null,
+            ),*/
         ),
         series: <SplineSeries<GraphData, DateTime>>[
           SplineSeries<GraphData, DateTime>(
@@ -73,7 +63,9 @@ class Graph extends StatelessWidget {
             // Renders the marker
             markerSettings: MarkerSettings(isVisible: true),
           ),
-        ]);
+        ],
+      ),
+    );
   }
 }
 
@@ -81,4 +73,12 @@ class GraphData {
   GraphData(this.time, this.value);
   final DateTime time;
   final double value;
+/*
+  factory GraphData.fromJson(Map<DateTime, dynamic> parsedJson) {
+    print(parsedJson.runtimeType);
+    return GraphData(
+      DateTime.parse(parsedJson['time'].toString()),
+      parsedJson['value'],
+    );
+  }*/
 }

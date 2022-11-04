@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_staggered_grid_view:
   syncfusion_flutter_charts:
+  firebase_database:
 
 dev_dependencies:
   flutter_test:
