@@ -8,7 +8,6 @@ class Graph extends StatelessWidget {
   const Graph({
     Key? key,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -20,6 +19,7 @@ class Graph extends StatelessWidget {
         ),
         // Initialize category axis
         primaryXAxis: DateTimeAxis(),
+        primaryYAxis: NumericAxis(minimum: 0, maximum: 30),
         //tooltipBehavior: TooltipBehavior(enable: true),
 
         /// To set the track ball as true and customized trackball behaviour.
@@ -48,9 +48,9 @@ class Graph extends StatelessWidget {
             xValueMapper: (GraphData data, _) => data.time,
             yValueMapper: (GraphData data, _) =>
                 data.value, // Enable data label
-            dataLabelSettings: DataLabelSettings(isVisible: true),
+            //dataLabelSettings: DataLabelSettings(isVisible: true),
             // Renders the marker
-            markerSettings: MarkerSettings(isVisible: true),
+            //markerSettings: MarkerSettings(isVisible: true),
           ),
           SplineSeries<GraphData, DateTime>(
             name: "Temperature",
@@ -59,9 +59,9 @@ class Graph extends StatelessWidget {
             xValueMapper: (GraphData data, _) => data.time,
             yValueMapper: (GraphData data, _) =>
                 data.value, // Enable data label
-            dataLabelSettings: DataLabelSettings(isVisible: true),
+            //dataLabelSettings: DataLabelSettings(isVisible: true),
             // Renders the marker
-            markerSettings: MarkerSettings(isVisible: true),
+            //markerSettings: MarkerSettings(isVisible: true),
           ),
         ],
       ),

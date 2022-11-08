@@ -1,13 +1,18 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'conpoments/graph.dart';
 import 'firebase_options.dart';
 
 var firebaseDB;
+ChartSeriesController? _chartSeriesController;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +23,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.indigo,
         primaryColor: Colors.indigo,
         primaryColorLight: Colors.indigo.shade300,
-        primaryColorDark: Colors.indigo.shade700,
+        primaryColorDark: Colors.indigo.shade900,
         backgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSwatch().copyWith(
           secondary: Colors.white,
@@ -61,10 +65,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String currentPHLevel = '0', currentTempLevel = '0';
+  //Initialize the series controller
+
+  Timer? timer;
 
   @override
   void initState() {
     fetchData();
+    timer = Timer.periodic(const Duration(seconds: 5), _updateDataSourceTest);
     super.initState();
   }
 
@@ -75,14 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
     final jsonResponse = json.decode('{"test":"1"}');
     print(json.encode(snapshot_ph.value[0]));*/
     if (snapshot_ph.exists) {
-      final jsonResponse = json.encode(snapshot_ph.value);
-      final Response = json.decode(jsonResponse);
-      for (var i = 0; i < Response.length; i++) {
+      final jsonResponse_ph = json.encode(snapshot_ph.value);
+      final Response_ph = json.decode(jsonResponse_ph);
+      for (var i = 0; i < Response_ph.length; i++) {
         setState(() {
           phGraphData.add(GraphData(
-              DateTime.parse(Response[i]['time']), Response[i]['value']));
-          if (i == Response.length - 1) {
-            currentPHLevel = Response[i]['value'].toString();
+              DateTime.parse(Response_ph[i]['time']), Response_ph[i]['value']));
+          if (i == Response_ph.length - 1) {
+            currentPHLevel = Response_ph[i]['value'].toString();
           }
         });
       }
@@ -92,14 +100,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
     var snapshot_temp = await ref.child('temp/').get();
     if (snapshot_temp.exists) {
-      final jsonResponse = json.encode(snapshot_temp.value);
-      final Response = json.decode(jsonResponse);
-      for (var i = 0; i < Response.length; i++) {
+      final jsonResponse_temp = json.encode(snapshot_temp.value);
+      final Response_temp = json.decode(jsonResponse_temp);
+      for (var i = 0; i < Response_temp.length; i++) {
         setState(() {
-          tempGraphData.add(GraphData(
-              DateTime.parse(Response[i]['time']), Response[i]['value']));
-          if (i == Response.length - 1) {
-            currentTempLevel = Response[i]['value'].toString();
+          tempGraphData.add(GraphData(DateTime.parse(Response_temp[i]['time']),
+              Response_temp[i]['value']));
+          if (i == Response_temp.length - 1) {
+            currentTempLevel = Response_temp[i]['value'].toString();
           }
         });
       }
@@ -107,6 +115,164 @@ class _MyHomePageState extends State<MyHomePage> {
       print('No data available.');
     }
   }
+
+  DateTime datetime = DateTime.parse('2020-01-02 12');
+
+  /// Continuously updating the data source based on timer.
+  /*void _updateDataSourceTest(Timer timer) {
+    setState(() {
+      /*
+      double randomNumber = Random().nextDouble() * 10;
+      phGraphData.add(GraphData(datetime, randomNumber));
+      //randomNumber = Random().nextDouble() * 30;
+      //tempGraphData.add(GraphData(datetime, randomNumber));
+
+      datetime = datetime.add(Duration(hours: 1));
+      phGraphData.add(GraphData(datetime, randomNumber));
+      //randomNumber = Random().nextDouble() * 30;
+      //tempGraphData.add(GraphData(datetime, randomNumber));
+
+      datetime = datetime.add(Duration(hours: 1));
+      phGraphData.add(GraphData(datetime, randomNumber));
+      //randomNumber = Random().nextDouble() * 30;
+      //tempGraphData.add(GraphData(datetime, randomNumber));
+*/
+
+      double randomNumber = Random().nextDouble() * 10;
+      phGraphData.add(GraphData(datetime, randomNumber));
+      datetime = datetime.add(Duration(hours: 1));
+      randomNumber = Random().nextDouble() * 10;
+      phGraphData.add(GraphData(datetime, randomNumber));
+      datetime = datetime.add(Duration(hours: 1));
+      randomNumber = Random().nextDouble() * 10;
+      phGraphData.add(GraphData(datetime, randomNumber));
+
+      if (phGraphData.length >= 10) {
+        while (phGraphData.length >= 10) {
+          phGraphData.removeAt(0);
+          _chartSeriesController?.updateDataSource(
+            removedDataIndexes: <int>[0],
+          );
+        }
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[phGraphData.length - 1],
+        );
+      } else {
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[phGraphData.length - 1],
+        );
+      }
+      /*
+      if (phGraphData.length >= 10) {
+        while (phGraphData.length >= 10) {
+          phGraphData.removeAt(0);
+          _chartSeriesController?.updateDataSource(
+            addedDataIndexes: <int>[phGraphData.length - 1],
+            removedDataIndexes: <int>[0],
+          );
+        }
+      } else {
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[phGraphData.length - 1],
+        );
+      }
+      if (tempGraphData.length >= 10) {
+        while (tempGraphData.length >= 10) {
+          tempGraphData.removeAt(0);
+          _chartSeriesController?.updateDataSource(
+            addedDataIndexes: <int>[tempGraphData.length - 1],
+            removedDataIndexes: <int>[0],
+          );
+        }
+      } else {
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[tempGraphData.length - 1],
+        );
+      }*/
+    });
+  }
+  */
+  void _updateDataSourceTest(Timer timer) {
+    setState(() {
+      double randomNumber = Random().nextDouble() * 10;
+      phGraphData.add(GraphData(datetime, randomNumber));
+      datetime = datetime.add(Duration(hours: 1));
+      randomNumber = Random().nextDouble() * 10;
+      phGraphData.add(GraphData(datetime, randomNumber));
+      datetime = datetime.add(Duration(hours: 1));
+      randomNumber = Random().nextDouble() * 10;
+      phGraphData.add(GraphData(datetime, randomNumber));
+      if (phGraphData.length >= 10) {
+        while (phGraphData.length >= 10) {
+          phGraphData.removeAt(0);
+          _chartSeriesController?.updateDataSource(
+            addedDataIndexes: <int>[phGraphData.length - 1],
+            removedDataIndexes: <int>[0],
+          );
+        }
+      } else {
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[phGraphData.length - 1],
+        );
+      }
+
+      randomNumber = Random().nextDouble() * 30;
+      tempGraphData.add(GraphData(datetime, randomNumber));
+      datetime = datetime.add(Duration(hours: 1));
+      randomNumber = Random().nextDouble() * 30;
+      tempGraphData.add(GraphData(datetime, randomNumber));
+      datetime = datetime.add(Duration(hours: 1));
+      randomNumber = Random().nextDouble() * 30;
+      tempGraphData.add(GraphData(datetime, randomNumber));
+      if (tempGraphData.length >= 10) {
+        while (tempGraphData.length >= 10) {
+          tempGraphData.removeAt(0);
+          _chartSeriesController?.updateDataSource(
+            addedDataIndexes: <int>[tempGraphData.length - 1],
+            removedDataIndexes: <int>[0],
+          );
+        }
+      } else {
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[tempGraphData.length - 1],
+        );
+      }
+    });
+  }
+/*
+  void _updateDataSource(Timer timer) {
+    setState(() {
+      fetchData();
+      phGraphData.add(GraphData(datetime, randomNumber));
+      if (phGraphData.length == 10) {
+        phGraphData.removeAt(0);
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[phGraphData.length - 1],
+          removedDataIndexes: <int>[0],
+        );
+      } else {
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[phGraphData.length - 1],
+        );
+      }
+
+      randomNumber = Random().nextDouble() * 30;
+      tempGraphData.add(GraphData(datetime, randomNumber));
+      if (tempGraphData.length == 10) {
+        tempGraphData.removeAt(0);
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[tempGraphData.length - 1],
+          removedDataIndexes: <int>[0],
+        );
+      } else {
+        _chartSeriesController?.updateDataSource(
+          addedDataIndexes: <int>[tempGraphData.length - 1],
+        );
+      }
+
+      datetime = datetime.add(Duration(hours: 1));
+    });
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +298,12 @@ class _MyHomePageState extends State<MyHomePage> {
               flex: 5,
               child: Column(
                 children: [
-                  Container(
-                    height: 50,
-                    color: Colors.green,
+                  Card(
+                    elevation: 5,
+                    child: Container(
+                      height: 50,
+                      color: Colors.white,
+                    ),
                   ),
                   Expanded(
                       child: Row(
@@ -331,21 +500,35 @@ class SideMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Drawer(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).primaryColorDark,
         child: SingleChildScrollView(
           child: Column(
             children: [
               DrawerHeader(
-                  child: Icon(
-                Icons.flutter_dash,
-                size: 50,
+                  child: Column(
+                children: [
+                  Text(
+                    'Ultifeeder',
+                    style: TextStyle(
+                        color: Theme.of(context).backgroundColor, fontSize: 36),
+                  ),
+                  SvgPicture.asset(
+                    'logo.svg',
+                    color: Colors.white,
+                    height: 80,
+                  ),
+                ],
               )),
               ListTile(
                 onTap: () {},
-                leading: Image.asset(
+                /*leading: Image.asset(
                   "web/icons/Icon-192.png",
+                ),*/
+                title: Text(
+                  "Dashboard",
+                  style: TextStyle(
+                      color: Theme.of(context).backgroundColor, fontSize: 20),
                 ),
-                title: Text("title"),
               ),
             ],
           ),
