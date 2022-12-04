@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:utifeeder_flutter/main.dart';
 
 List<GraphData> phGraphData = <GraphData>[];
 List<GraphData> tempGraphData = <GraphData>[];
@@ -14,6 +17,7 @@ class Graph extends StatelessWidget {
       elevation: 5,
       child: SfCartesianChart(
         //title: ChartTitle(text: "test"),
+        enableAxisAnimation: true,
         legend: Legend(
           isVisible: true,
         ),
@@ -51,6 +55,9 @@ class Graph extends StatelessWidget {
             //dataLabelSettings: DataLabelSettings(isVisible: true),
             // Renders the marker
             //markerSettings: MarkerSettings(isVisible: true),
+            onRendererCreated: (ChartSeriesController controller) {
+              chartSeriesController_ph = controller;
+            },
           ),
           SplineSeries<GraphData, DateTime>(
             name: "Temperature",
@@ -62,13 +69,16 @@ class Graph extends StatelessWidget {
             //dataLabelSettings: DataLabelSettings(isVisible: true),
             // Renders the marker
             //markerSettings: MarkerSettings(isVisible: true),
+            onRendererCreated: (ChartSeriesController controller) {
+              chartSeriesController_temp = controller;
+            },
           ),
         ],
       ),
     );
   }
 }
-
+/*
 class GraphData {
   GraphData(this.time, this.value);
   final DateTime time;
@@ -81,4 +91,35 @@ class GraphData {
       parsedJson['value'],
     );
   }*/
+}*/
+
+// To parse this JSON data, do
+//
+//     final graphdata = graphdataFromJson(jsonString);
+
+Map<String, GraphData> graphdataFromJson(String str) =>
+    Map.from(json.decode(str))
+        .map((k, v) => MapEntry<String, GraphData>(k, GraphData.fromJson(v)));
+
+String graphdataToJson(Map<String, GraphData> data) => json.encode(
+    Map.from(data).map((k, v) => MapEntry<String, dynamic>(k, v.toJson())));
+
+class GraphData {
+  GraphData({
+    required this.time,
+    required this.value,
+  });
+
+  DateTime time;
+  double value;
+
+  factory GraphData.fromJson(Map<String, dynamic> json) => GraphData(
+        time: DateTime.parse(json["time"]),
+        value: json["value"].toDouble(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "time": time.toIso8601String(),
+        "value": value,
+      };
 }

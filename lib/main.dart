@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -12,7 +11,7 @@ import 'conpoments/graph.dart';
 import 'firebase_options.dart';
 
 var firebaseDB;
-ChartSeriesController? _chartSeriesController;
+ChartSeriesController? chartSeriesController_ph, chartSeriesController_temp;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,208 +70,136 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    fetchData();
-    timer = Timer.periodic(const Duration(seconds: 5), _updateDataSourceTest);
+    timer = Timer.periodic(const Duration(seconds: 5), fetchData);
     super.initState();
   }
 
-  fetchData() async {
+  fetchData(Timer timer) async {
     final ref = firebaseDB.ref();
-    var snapshot_ph = await ref.child('ph/').get();
-    /*final jsonResponse = json.encode(snapshot_ph.value);
-    final jsonResponse = json.decode('{"test":"1"}');
-    print(json.encode(snapshot_ph.value[0]));*/
+    DataSnapshot snapshot_ph = await ref.child('ph/').limitToLast(10).get();
     if (snapshot_ph.exists) {
       final jsonResponse_ph = json.encode(snapshot_ph.value);
-      final Response_ph = json.decode(jsonResponse_ph);
-      for (var i = 0; i < Response_ph.length; i++) {
-        setState(() {
-          phGraphData.add(GraphData(
-              DateTime.parse(Response_ph[i]['time']), Response_ph[i]['value']));
-          if (i == Response_ph.length - 1) {
-            currentPHLevel = Response_ph[i]['value'].toString();
+      final Response_ph = graphdataFromJson(jsonResponse_ph);
+
+      List<bool> isExistList = [];
+      List<GraphData> temp_phGraphData = [];
+
+      if (phGraphData.isEmpty) {
+        //Add all data
+        for (var data in Response_ph.values) {
+          DateTime time = data.time;
+          double value = data.value;
+          phGraphData.add(GraphData(time: time, value: value));
+        }
+      } else {
+        for (var data in Response_ph.values) {
+          DateTime time = data.time;
+          double value = data.value;
+          bool isExist = false;
+
+          //Check if exist
+          for (var a in phGraphData) {
+            if (a.time == time) {
+              isExist = true;
+              break;
+            }
           }
-        });
+          temp_phGraphData.add(GraphData(time: time, value: value));
+          isExistList.add(isExist);
+        }
+      }
+
+      int index = 0;
+      for (var a in isExistList) {
+        if (a == false) {
+          phGraphData.add(temp_phGraphData[index]);
+          chartSeriesController_ph?.updateDataSource(
+              addedDataIndexes: <int>[phGraphData.length - 1]);
+        }
+        if (phGraphData.length > 10) {
+          while (phGraphData.length > 10) {
+            phGraphData.removeAt(0);
+            chartSeriesController_ph?.updateDataSource(
+              removedDataIndexes: <int>[0],
+            );
+          }
+        }
+        if (index == Response_ph.length - 1) {
+          if (currentPHLevel != temp_phGraphData[index].value.toString()) {
+            setState(() {
+              //At the last loop set Response_temp.length
+              currentPHLevel = temp_phGraphData[index].value.toString();
+            });
+          }
+        }
+        index++;
       }
     } else {
       print('No data available.');
     }
 
-    var snapshot_temp = await ref.child('temp/').get();
+    DataSnapshot snapshot_temp = await ref.child('temp/').limitToLast(10).get();
     if (snapshot_temp.exists) {
       final jsonResponse_temp = json.encode(snapshot_temp.value);
-      final Response_temp = json.decode(jsonResponse_temp);
-      for (var i = 0; i < Response_temp.length; i++) {
-        setState(() {
-          tempGraphData.add(GraphData(DateTime.parse(Response_temp[i]['time']),
-              Response_temp[i]['value']));
-          if (i == Response_temp.length - 1) {
-            currentTempLevel = Response_temp[i]['value'].toString();
+      final Response_temp = graphdataFromJson(jsonResponse_temp);
+
+      List<bool> isExistList = [];
+      List<GraphData> temp_tempGraphData = [];
+
+      if (tempGraphData.isEmpty) {
+        //Add all data
+        for (var data in Response_temp.values) {
+          DateTime time = data.time;
+          double value = data.value;
+          tempGraphData.add(GraphData(time: time, value: value));
+        }
+      } else {
+        for (var data in Response_temp.values) {
+          DateTime time = data.time;
+          double value = data.value;
+          bool isExist = false;
+
+          //Check if exist
+          for (var a in tempGraphData) {
+            if (a.time == time) {
+              isExist = true;
+              break;
+            }
           }
-        });
+          temp_tempGraphData.add(GraphData(time: time, value: value));
+          isExistList.add(isExist);
+        }
+      }
+
+      int index = 0;
+      for (var a in isExistList) {
+        if (a == false) {
+          phGraphData.add(temp_tempGraphData[index]);
+          chartSeriesController_temp?.updateDataSource(
+              addedDataIndexes: <int>[tempGraphData.length - 1]);
+        }
+        if (tempGraphData.length > 10) {
+          while (tempGraphData.length > 10) {
+            tempGraphData.removeAt(0);
+            chartSeriesController_temp?.updateDataSource(
+              removedDataIndexes: <int>[0],
+            );
+          }
+        }
+        if (index == Response_temp.length - 1) {
+          if (currentTempLevel != temp_tempGraphData[index].value.toString()) {
+            setState(() {
+              //At the last loop set Response_temp.length
+              currentTempLevel = temp_tempGraphData[index].value.toString();
+            });
+          }
+        }
+        index++;
       }
     } else {
       print('No data available.');
     }
   }
-
-  DateTime datetime = DateTime.parse('2020-01-02 12');
-
-  /// Continuously updating the data source based on timer.
-  /*void _updateDataSourceTest(Timer timer) {
-    setState(() {
-      /*
-      double randomNumber = Random().nextDouble() * 10;
-      phGraphData.add(GraphData(datetime, randomNumber));
-      //randomNumber = Random().nextDouble() * 30;
-      //tempGraphData.add(GraphData(datetime, randomNumber));
-
-      datetime = datetime.add(Duration(hours: 1));
-      phGraphData.add(GraphData(datetime, randomNumber));
-      //randomNumber = Random().nextDouble() * 30;
-      //tempGraphData.add(GraphData(datetime, randomNumber));
-
-      datetime = datetime.add(Duration(hours: 1));
-      phGraphData.add(GraphData(datetime, randomNumber));
-      //randomNumber = Random().nextDouble() * 30;
-      //tempGraphData.add(GraphData(datetime, randomNumber));
-*/
-
-      double randomNumber = Random().nextDouble() * 10;
-      phGraphData.add(GraphData(datetime, randomNumber));
-      datetime = datetime.add(Duration(hours: 1));
-      randomNumber = Random().nextDouble() * 10;
-      phGraphData.add(GraphData(datetime, randomNumber));
-      datetime = datetime.add(Duration(hours: 1));
-      randomNumber = Random().nextDouble() * 10;
-      phGraphData.add(GraphData(datetime, randomNumber));
-
-      if (phGraphData.length >= 10) {
-        while (phGraphData.length >= 10) {
-          phGraphData.removeAt(0);
-          _chartSeriesController?.updateDataSource(
-            removedDataIndexes: <int>[0],
-          );
-        }
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[phGraphData.length - 1],
-        );
-      } else {
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[phGraphData.length - 1],
-        );
-      }
-      /*
-      if (phGraphData.length >= 10) {
-        while (phGraphData.length >= 10) {
-          phGraphData.removeAt(0);
-          _chartSeriesController?.updateDataSource(
-            addedDataIndexes: <int>[phGraphData.length - 1],
-            removedDataIndexes: <int>[0],
-          );
-        }
-      } else {
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[phGraphData.length - 1],
-        );
-      }
-      if (tempGraphData.length >= 10) {
-        while (tempGraphData.length >= 10) {
-          tempGraphData.removeAt(0);
-          _chartSeriesController?.updateDataSource(
-            addedDataIndexes: <int>[tempGraphData.length - 1],
-            removedDataIndexes: <int>[0],
-          );
-        }
-      } else {
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[tempGraphData.length - 1],
-        );
-      }*/
-    });
-  }
-  */
-  void _updateDataSourceTest(Timer timer) {
-    setState(() {
-      double randomNumber = Random().nextDouble() * 10;
-      phGraphData.add(GraphData(datetime, randomNumber));
-      datetime = datetime.add(Duration(hours: 1));
-      randomNumber = Random().nextDouble() * 10;
-      phGraphData.add(GraphData(datetime, randomNumber));
-      datetime = datetime.add(Duration(hours: 1));
-      randomNumber = Random().nextDouble() * 10;
-      phGraphData.add(GraphData(datetime, randomNumber));
-      if (phGraphData.length >= 10) {
-        while (phGraphData.length >= 10) {
-          phGraphData.removeAt(0);
-          _chartSeriesController?.updateDataSource(
-            addedDataIndexes: <int>[phGraphData.length - 1],
-            removedDataIndexes: <int>[0],
-          );
-        }
-      } else {
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[phGraphData.length - 1],
-        );
-      }
-
-      randomNumber = Random().nextDouble() * 30;
-      tempGraphData.add(GraphData(datetime, randomNumber));
-      datetime = datetime.add(Duration(hours: 1));
-      randomNumber = Random().nextDouble() * 30;
-      tempGraphData.add(GraphData(datetime, randomNumber));
-      datetime = datetime.add(Duration(hours: 1));
-      randomNumber = Random().nextDouble() * 30;
-      tempGraphData.add(GraphData(datetime, randomNumber));
-      if (tempGraphData.length >= 10) {
-        while (tempGraphData.length >= 10) {
-          tempGraphData.removeAt(0);
-          _chartSeriesController?.updateDataSource(
-            addedDataIndexes: <int>[tempGraphData.length - 1],
-            removedDataIndexes: <int>[0],
-          );
-        }
-      } else {
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[tempGraphData.length - 1],
-        );
-      }
-    });
-  }
-/*
-  void _updateDataSource(Timer timer) {
-    setState(() {
-      fetchData();
-      phGraphData.add(GraphData(datetime, randomNumber));
-      if (phGraphData.length == 10) {
-        phGraphData.removeAt(0);
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[phGraphData.length - 1],
-          removedDataIndexes: <int>[0],
-        );
-      } else {
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[phGraphData.length - 1],
-        );
-      }
-
-      randomNumber = Random().nextDouble() * 30;
-      tempGraphData.add(GraphData(datetime, randomNumber));
-      if (tempGraphData.length == 10) {
-        tempGraphData.removeAt(0);
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[tempGraphData.length - 1],
-          removedDataIndexes: <int>[0],
-        );
-      } else {
-        _chartSeriesController?.updateDataSource(
-          addedDataIndexes: <int>[tempGraphData.length - 1],
-        );
-      }
-
-      datetime = datetime.add(Duration(hours: 1));
-    });
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -391,7 +318,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         tempGraphData =
                                             <GraphData>[]; //claer data in list
 
-                                        fetchData();
+                                        //fetchData();
                                       });
                                     },
                                     child: Icon(
@@ -403,84 +330,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   )),
-
-                  /*Row(
-                    children: [
-                      Expanded(
-                        child: Card(
-                          elevation: 5,
-                          child: InkWell(
-                            onTap: () {},
-                            child: Container(
-                              height: 500,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          children: [
-                            Card(
-                              elevation: 5,
-                              child: Container(
-                                height: 500,
-                                child: SfCartesianChart(
-                                    // Initialize category axis
-                                    primaryXAxis: CategoryAxis(),
-                                    tooltipBehavior:
-                                        TooltipBehavior(enable: true),
-
-                                    /// To set the track ball as true and customized trackball behaviour.
-                                    trackballBehavior: TrackballBehavior(
-                                      enable: true,
-                                      markerSettings: TrackballMarkerSettings(
-                                        markerVisibility:
-                                            TrackballVisibilityMode.visible,
-                                        height: 10,
-                                        width: 10,
-                                        borderWidth: 1,
-                                      ),
-                                      activationMode: ActivationMode.singleTap,
-                                      tooltipDisplayMode:
-                                          TrackballDisplayMode.floatAllPoints,
-                                      tooltipSettings: InteractiveTooltip(
-                                        format: TrackballDisplayMode
-                                                    .floatAllPoints !=
-                                                TrackballDisplayMode
-                                                    .groupAllPoints
-                                            ? 'series.name : point.y'
-                                            : null,
-                                      ),
-                                    ),
-                                    series: <SplineSeries<SalesData, String>>[
-                                      SplineSeries<SalesData, String>(
-                                          // Bind data source
-                                          dataSource: <SalesData>[
-                                            SalesData('Jan', 35),
-                                            SalesData('Feb', 28),
-                                            SalesData('Mar', 34),
-                                            SalesData('Apr', 32),
-                                            SalesData('May', 40)
-                                          ],
-                                          xValueMapper: (SalesData sales, _) =>
-                                              sales.year,
-                                          yValueMapper: (SalesData sales, _) =>
-                                              sales.sales, // Enable data label
-                                          dataLabelSettings: DataLabelSettings(
-                                              isVisible: true))
-                                    ]),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        height: 50,
-                        color: Colors.red,
-                      ),
-                    ],
-                  )*/
                 ],
               ),
             ),
