@@ -90,6 +90,9 @@ class _MyHomePageState extends State<MyHomePage> {
           DateTime time = data.time;
           double value = data.value;
           phGraphData.add(GraphData(time: time, value: value));
+          setState(() {});
+          //chartSeriesController_ph?.updateDataSource(
+          //    addedDataIndexes: <int>[phGraphData.length - 1]);
         }
       } else {
         for (var data in Response_ph.values) {
@@ -114,13 +117,15 @@ class _MyHomePageState extends State<MyHomePage> {
         if (a == false) {
           phGraphData.add(temp_phGraphData[index]);
           chartSeriesController_ph?.updateDataSource(
-              addedDataIndexes: <int>[phGraphData.length - 1]);
+            addedDataIndex: phGraphData.length - 1,
+            removedDataIndex: 0,
+          );
         }
         if (phGraphData.length > 10) {
           while (phGraphData.length > 10) {
             phGraphData.removeAt(0);
             chartSeriesController_ph?.updateDataSource(
-              removedDataIndexes: <int>[0],
+              removedDataIndex: 0,
             );
           }
         }
@@ -174,15 +179,15 @@ class _MyHomePageState extends State<MyHomePage> {
       int index = 0;
       for (var a in isExistList) {
         if (a == false) {
-          phGraphData.add(temp_tempGraphData[index]);
+          tempGraphData.add(temp_tempGraphData[index]);
           chartSeriesController_temp?.updateDataSource(
-              addedDataIndexes: <int>[tempGraphData.length - 1]);
+              addedDataIndex: tempGraphData.length - 1);
         }
         if (tempGraphData.length > 10) {
           while (tempGraphData.length > 10) {
             tempGraphData.removeAt(0);
             chartSeriesController_temp?.updateDataSource(
-              removedDataIndexes: <int>[0],
+              removedDataIndex: 0,
             );
           }
         }
@@ -309,22 +314,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               flex: 5,
                               child: Graph(),
                             ),
-                            Expanded(
-                                child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        phGraphData =
-                                            <GraphData>[]; //claer data in list
-                                        tempGraphData =
-                                            <GraphData>[]; //claer data in list
-
-                                        //fetchData();
-                                      });
-                                    },
-                                    child: Icon(
-                                      Icons.refresh,
-                                      color: Colors.blue,
-                                    )))
                           ],
                         ),
                       ),
