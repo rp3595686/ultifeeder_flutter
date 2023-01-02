@@ -275,18 +275,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                         children: [
                                           Align(
                                             alignment: Alignment.topLeft,
-                                            child: Text(
-                                              ' pH Level:',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w700),
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                ' pH Level:',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
                                             ),
                                           ),
-                                          Text(
-                                            currentPHLevel,
-                                            style: TextStyle(
-                                                fontSize: 36,
-                                                fontWeight: FontWeight.w900),
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              currentPHLevel,
+                                              style: TextStyle(
+                                                  fontSize: 36,
+                                                  fontWeight: FontWeight.w900),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -299,18 +306,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                         children: [
                                           Align(
                                             alignment: Alignment.topLeft,
-                                            child: Text(
-                                              ' Temperature:',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w700),
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                ' Temperature:',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
                                             ),
                                           ),
-                                          Text(
-                                            currentTempLevel,
-                                            style: TextStyle(
-                                                fontSize: 36,
-                                                fontWeight: FontWeight.w900),
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              currentTempLevel,
+                                              style: TextStyle(
+                                                  fontSize: 36,
+                                                  fontWeight: FontWeight.w900),
+                                            ),
                                           ),
                                         ],
                                       ),
