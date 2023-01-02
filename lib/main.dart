@@ -9,6 +9,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'conpoments/graph.dart';
 import 'firebase_options.dart';
+import 'responsive.dart';
 
 var firebaseDB;
 ChartSeriesController? chartSeriesController_ph, chartSeriesController_temp;
@@ -226,7 +227,8 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (false) SideMenu(),
+            if (!Responsive.isMobile(context))
+              SideMenu(), //If it is not mobile, show SideMenu
             Expanded(
               flex: 5,
               child: Column(
