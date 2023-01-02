@@ -157,6 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
           DateTime time = data.time;
           double value = data.value;
           tempGraphData.add(GraphData(time: time, value: value));
+          setState(() {});
         }
       } else {
         for (var data in Response_temp.values) {
@@ -225,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SideMenu(),
+            if (false) SideMenu(),
             Expanded(
               flex: 5,
               child: Column(
@@ -235,6 +236,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Container(
                       height: 50,
                       color: Colors.white,
+                      child: Row(
+                        children: [
+                          Text('Dashboard'),
+                        ],
+                      ),
                     ),
                   ),
                   Expanded(
