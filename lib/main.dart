@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -353,10 +354,14 @@ class SideMenu extends StatelessWidget {
               DrawerHeader(
                   child: Column(
                 children: [
-                  Text(
-                    'Ultifeeder',
-                    style: TextStyle(
-                        color: Theme.of(context).backgroundColor, fontSize: 36),
+                  FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      'Ultifeeder',
+                      style: TextStyle(
+                          color: Theme.of(context).backgroundColor,
+                          fontSize: 36),
+                    ),
                   ),
                   SvgPicture.asset(
                     'logo.svg',
