@@ -247,107 +247,121 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Expanded(
-                      child: Row(
-                    children: [
-                      Expanded(
-                          child: Card(
-                        elevation: 5,
-                        child: InkWell(
-                          onTap: () {},
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(child: Text("Everything is good :)")),
-                            ],
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Card(
+                          elevation: 5,
+                          child: InkWell(
+                            onTap: () {},
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Center(child: Text("Everything is good :)")),
+                              ],
+                            ),
                           ),
-                        ),
-                      )),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Card(
-                                      elevation: 5,
-                                      child: Column(
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.topLeft,
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              child: Text(
-                                                ' pH Level:',
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                              ),
-                                            ),
-                                          ),
-                                          FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: Text(
-                                              currentPHLevel,
-                                              style: TextStyle(
-                                                  fontSize: 36,
-                                                  fontWeight: FontWeight.w900),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Card(
-                                      elevation: 5,
-                                      child: Column(
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.topLeft,
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              child: Text(
-                                                ' Temperature:',
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                              ),
-                                            ),
-                                          ),
-                                          FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: Text(
-                                              currentTempLevel,
-                                              style: TextStyle(
-                                                  fontSize: 36,
-                                                  fontWeight: FontWeight.w900),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Graph(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )),
+                        )),
+                        if (!Responsive.isMobile(context))
+                          Expanded(
+                            child: DashboardSensorDetail(
+                                currentPHLevel: currentPHLevel,
+                                currentTempLevel: currentTempLevel),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class DashboardSensorDetail extends StatelessWidget {
+  const DashboardSensorDetail({
+    Key? key,
+    required this.currentPHLevel,
+    required this.currentTempLevel,
+  }) : super(key: key);
+
+  final String currentPHLevel;
+  final String currentTempLevel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: Card(
+                  elevation: 5,
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            ' pH Level:',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          currentPHLevel,
+                          style: TextStyle(
+                              fontSize: 36, fontWeight: FontWeight.w900),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Card(
+                  elevation: 5,
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            ' Temperature:',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          currentTempLevel,
+                          style: TextStyle(
+                              fontSize: 36, fontWeight: FontWeight.w900),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 5,
+          child: Graph(),
+        ),
+      ],
     );
   }
 }
