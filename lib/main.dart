@@ -249,19 +249,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     child: Row(
                       children: [
-                        Expanded(
-                            child: Card(
-                          elevation: 5,
-                          child: InkWell(
-                            onTap: () {},
+                        Responsive(
+                          mobile: Expanded(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Center(child: Text("Everything is good :)")),
+                                DashboardMessage(),
+                                Expanded(
+                                  flex: 3,
+                                  child: DashboardSensorDetail(
+                                      currentPHLevel: currentPHLevel,
+                                      currentTempLevel: currentTempLevel),
+                                )
                               ],
                             ),
                           ),
-                        )),
+                          tablet: DashboardMessage(),
+                          desktop: DashboardMessage(),
+                        ),
                         if (!Responsive.isMobile(context))
                           Expanded(
                             child: DashboardSensorDetail(
@@ -276,6 +280,29 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class DashboardMessage extends StatelessWidget {
+  const DashboardMessage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ListView.separated(
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            title: Text('Everything is OK :)'),
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return const Divider();
+        },
+        itemCount: 20,
       ),
     );
   }
