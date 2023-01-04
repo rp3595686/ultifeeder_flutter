@@ -235,10 +235,11 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (!Responsive.isMobile(context))
+            if (Responsive.isDesktop(
+                context)) //Don't collapse SideMenu on desktop
               Expanded(
                 child: SideMenu(),
-              ), //If it is not mobile, show SideMenu
+              ),
             Expanded(
               flex: 5,
               child: Column(
@@ -250,11 +251,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.white,
                       child: Row(
                         children: [
-                          IconButton(
-                            onPressed:
-                                context.read<MenuController>().controlMenu,
-                            icon: Icon(Icons.menu),
-                          ),
+                          if (!Responsive.isDesktop(context)) //Hide open SideMenu button on Desktop
+                            IconButton(
+                              onPressed:
+                                  context.read<MenuController>().controlMenu,
+                              icon: Icon(Icons.menu),
+                            ),
                           Text('Dashboard'),
                         ],
                       ),
