@@ -330,19 +330,25 @@ class DashboardSensorDetail extends StatelessWidget {
                   elevation: 5,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Column(
-                      children: [
-                        Text(
-                          ' pH Level:',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          currentPHLevel,
-                          style: TextStyle(
-                              fontSize: 36, fontWeight: FontWeight.w900),
-                        ),
-                      ],
+                    child: Container(
+                      padding: EdgeInsets.symmetric(),
+                      child: Column(
+                        children: [
+                          Text(
+                            'pH Level:',
+                            style: TextStyle(
+                                fontSize: 72, fontWeight: FontWeight.w700),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            currentPHLevel,
+                            style: TextStyle(
+                                fontSize: 72, fontWeight: FontWeight.w900),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -357,12 +363,15 @@ class DashboardSensorDetail extends StatelessWidget {
                         Text(
                           ' Temperature:',
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w700),
+                              fontSize: 72, fontWeight: FontWeight.w700),
+                        ),
+                        SizedBox(
+                          height: 10,
                         ),
                         Text(
                           currentTempLevel,
                           style: TextStyle(
-                              fontSize: 36, fontWeight: FontWeight.w900),
+                              fontSize: 72, fontWeight: FontWeight.w900),
                         ),
                       ],
                     ),
