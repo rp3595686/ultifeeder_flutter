@@ -6,7 +6,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:utifeeder_flutter/conpoments/controllers/menu_controller.dart';
 
 import 'conpoments/graph.dart';
 import 'firebase_options.dart';
@@ -28,21 +30,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ultifeeder Admin Panel',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        visualDensity: VisualDensity.comfortable,
-        primarySwatch: Colors.indigo,
-        primaryColor: Colors.indigo,
-        primaryColorLight: Colors.indigo.shade300,
-        primaryColorDark: Colors.indigo.shade900,
-        backgroundColor: Colors.white,
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: Colors.white,
+        title: 'Ultifeeder Admin Panel',
+        theme: ThemeData(
+          brightness: Brightness.light,
+          visualDensity: VisualDensity.comfortable,
+          primarySwatch: Colors.indigo,
+          primaryColor: Colors.indigo,
+          primaryColorLight: Colors.indigo.shade300,
+          primaryColorDark: Colors.indigo.shade900,
+          backgroundColor: Colors.white,
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            secondary: Colors.white,
+          ),
         ),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+        home: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (context) => MenuController(),
+            ),
+          ],
+          child: MyHomePage(title: 'Flutter Demo Home Page'),
+        )
+        // const MyHomePage(title: 'Flutter Demo Home Page'),
+        );
   }
 }
 
@@ -218,18 +228,17 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      drawer: Drawer(
-        child: Container(
-          color: Colors.yellow,
-        ),
-      ),
+      key: context.read<MenuController>().scaffoldKey,
+      drawer: SideMenu(),
       body: SafeArea(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!Responsive.isMobile(context))
-              SideMenu(), //If it is not mobile, show SideMenu
+              Expanded(
+                child: SideMenu(),
+              ), //If it is not mobile, show SideMenu
             Expanded(
               flex: 5,
               child: Column(
@@ -241,6 +250,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.white,
                       child: Row(
                         children: [
+                          IconButton(
+                            onPressed:
+                                context.read<MenuController>().controlMenu,
+                            icon: Icon(Icons.menu),
+                          ),
                           Text('Dashboard'),
                         ],
                       ),
@@ -397,44 +411,41 @@ class SideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Drawer(
-        backgroundColor: Theme.of(context).primaryColorDark,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              DrawerHeader(
-                  child: Column(
-                children: [
-                  FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Text(
-                      'Ultifeeder',
-                      style: TextStyle(
-                          color: Theme.of(context).backgroundColor,
-                          fontSize: 36),
-                    ),
+    return Drawer(
+      backgroundColor: Theme.of(context).primaryColorDark,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            DrawerHeader(
+                child: Column(
+              children: [
+                FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    'Ultifeeder',
+                    style: TextStyle(
+                        color: Theme.of(context).backgroundColor, fontSize: 36),
                   ),
-                  SvgPicture.asset(
-                    'logo.svg',
-                    color: Colors.white,
-                    height: 80,
-                  ),
-                ],
-              )),
-              ListTile(
-                onTap: () {},
-                /*leading: Image.asset(
-                  "web/icons/Icon-192.png",
-                ),*/
-                title: Text(
-                  "Dashboard",
-                  style: TextStyle(
-                      color: Theme.of(context).backgroundColor, fontSize: 20),
                 ),
+                SvgPicture.asset(
+                  'logo.svg',
+                  color: Colors.white,
+                  height: 80,
+                ),
+              ],
+            )),
+            ListTile(
+              onTap: () {},
+              /*leading: Image.asset(
+                "web/icons/Icon-192.png",
+              ),*/
+              title: Text(
+                "Dashboard",
+                style: TextStyle(
+                    color: Theme.of(context).backgroundColor, fontSize: 20),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
