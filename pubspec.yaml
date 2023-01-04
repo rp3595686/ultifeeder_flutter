@@ -40,6 +40,7 @@ dependencies:
   syncfusion_flutter_charts:
   firebase_database:
   flutter_svg:
+  provider:
 
 dev_dependencies:
   flutter_test:
