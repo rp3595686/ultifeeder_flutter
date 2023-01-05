@@ -251,7 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.white,
                       child: Row(
                         children: [
-                          if (!Responsive.isDesktop(context)) //Hide open SideMenu button on Desktop
+                          if (!Responsive.isDesktop(
+                              context)) //Hide open SideMenu button on Desktop
                             IconButton(
                               onPressed:
                                   context.read<MenuController>().controlMenu,
