@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:utifeeder_flutter/conpoments/setting_page.dart';
 
 import '../firebase_fetch.dart';
 import '../responsive.dart';
@@ -24,7 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   void initState() {
-    timer_ph = Timer.periodic(const Duration(seconds: 5), fetchData_ph);
+    timer_ph = Timer.periodic(Duration(seconds: phInterval), fetchData_ph);
     timer_temp = Timer.periodic(const Duration(seconds: 5), fetchData_temp);
     super.initState();
   }

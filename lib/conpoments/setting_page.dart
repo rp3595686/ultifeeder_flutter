@@ -8,8 +8,10 @@ class SettingPage extends StatefulWidget {
   State<SettingPage> createState() => _SettingPageState();
 }
 
-int phInterval_temp = 5;
 int phInterval = 5;
+String phInterval_temporary = '5';
+int tempInterval = 5;
+String tempInterval_temporary = '5';
 
 class _SettingPageState extends State<SettingPage> {
   @override
@@ -28,13 +30,28 @@ class _SettingPageState extends State<SettingPage> {
                   FilteringTextInputFormatter.digitsOnly,
                 ],
                 onChanged: (value) {
-                  if (value != '') {
-                    phInterval_temp = int.parse(value);
-                  }
+                  phInterval_temporary = value;
                 },
                 decoration: const InputDecoration(
                   border: UnderlineInputBorder(),
-                  labelText: 'Fetch pH data intervals',
+                  labelText: 'Fetch pH Data Interval (Default: 5 sec)',
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: TextFormField(
+                initialValue: phInterval.toString(),
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                onChanged: (value) {
+                  phInterval_temporary = value;
+                },
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Fetch Temperature Data Interval (Default: 5 sec)',
                 ),
               ),
             ),
@@ -43,7 +60,17 @@ class _SettingPageState extends State<SettingPage> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    phInterval = phInterval_temp;
+                    print(phInterval_temporary);
+                    if (phInterval_temporary == '' ||
+                        tempInterval_temporary == '') {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Please filled in all blanks')));
+                    } else {
+                      phInterval = int.parse(phInterval_temporary);
+                      tempInterval = int.parse(tempInterval_temporary);
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text('Saved')));
+                    }
                   });
                 },
                 child: Text('Save'),
