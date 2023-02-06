@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:utifeeder_flutter/conpoments/setting_page.dart';
 
 import 'conpoments/dashboard_page.dart';
 import 'conpoments/graph.dart';
@@ -119,3 +120,17 @@ Future fetchData_temp(Timer timer_temp) async {
       }*/
   }
 }
+
+Future fetchConfig() async {
+  DataSnapshot snapshot_config = await firebase_ref.child('config/').get();
+  if (snapshot_config.exists) {
+    final jsonResponse_config = json.encode(snapshot_config.value);
+
+    var configData = jsonDecode(jsonResponse_config);
+    phInterval = configData['phInterval'];
+    tempInterval = configData['tempInterval'];
+  }
+}
+
+Map<String, int> configdataFromJson(String str) =>
+    Map.from(json.decode(str)).map((k, v) => MapEntry<String, int>(k, (v)));

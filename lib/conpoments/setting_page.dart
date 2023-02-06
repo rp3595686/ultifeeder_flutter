@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:utifeeder_flutter/conpoments/page_scaffold.dart';
 
+import '../firebase_fetch.dart';
+
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
   @override
@@ -41,7 +43,7 @@ class _SettingPageState extends State<SettingPage> {
             Padding(
               padding: const EdgeInsets.all(8),
               child: TextFormField(
-                initialValue: phInterval.toString(),
+                initialValue: tempInterval.toString(),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
@@ -68,6 +70,11 @@ class _SettingPageState extends State<SettingPage> {
                     } else {
                       phInterval = int.parse(phInterval_temporary);
                       tempInterval = int.parse(tempInterval_temporary);
+                      firebase_ref.child('config/').set({
+                        // Save config to Firebase
+                        "phInterval": phInterval,
+                        "tempInterval": tempInterval
+                      });
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text('Saved')));
                     }
