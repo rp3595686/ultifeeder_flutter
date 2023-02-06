@@ -6,6 +6,7 @@ import 'package:utifeeder_flutter/conpoments/setting_page.dart';
 
 import 'conpoments/dashboard_page.dart';
 import 'conpoments/graph.dart';
+import 'conpoments/json_convert.dart';
 import 'main.dart';
 
 final firebase_ref = firebaseDB.ref();
@@ -131,6 +132,3 @@ Future fetchConfig() async {
     tempInterval = configData['tempInterval'];
   }
 }
-
-Map<String, int> configdataFromJson(String str) =>
-    Map.from(json.decode(str)).map((k, v) => MapEntry<String, int>(k, (v)));
