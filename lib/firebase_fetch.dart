@@ -129,6 +129,8 @@ Future fetchConfig() async {
 
     var configData = jsonDecode(jsonResponse_config);
     phInterval = configData['phInterval'];
+    phInterval_temporary = configData['phInterval'].toString();
     tempInterval = configData['tempInterval'];
+    tempInterval_temporary = configData['tempInterval'].toString();
   }
 }

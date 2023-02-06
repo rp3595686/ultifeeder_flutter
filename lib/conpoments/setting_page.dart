@@ -10,6 +10,7 @@ class SettingPage extends StatefulWidget {
   State<SettingPage> createState() => _SettingPageState();
 }
 
+//default interval = 5
 int phInterval = 5;
 String phInterval_temporary = '5';
 int tempInterval = 5;
@@ -49,7 +50,7 @@ class _SettingPageState extends State<SettingPage> {
                   FilteringTextInputFormatter.digitsOnly,
                 ],
                 onChanged: (value) {
-                  phInterval_temporary = value;
+                  tempInterval_temporary = value;
                 },
                 decoration: const InputDecoration(
                   border: UnderlineInputBorder(),
@@ -62,7 +63,6 @@ class _SettingPageState extends State<SettingPage> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    print(phInterval_temporary);
                     if (phInterval_temporary == '' ||
                         tempInterval_temporary == '') {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
