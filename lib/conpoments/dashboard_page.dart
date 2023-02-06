@@ -27,7 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     fetchConfig();
     timer_ph = Timer.periodic(Duration(seconds: phInterval), fetchData_ph);
-    timer_temp = Timer.periodic(const Duration(seconds: 5), fetchData_temp);
+    timer_temp = Timer.periodic(Duration(seconds: tempInterval), fetchData_temp);
     super.initState();
   }
 
