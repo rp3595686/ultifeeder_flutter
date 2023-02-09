@@ -67,13 +67,11 @@ class _DashboardPageState extends State<DashboardPage> {
             );
           }
         }
-        if (phGraphData.length > 10) {
-          while (phGraphData.length > 10) {
-            phGraphData.removeAt(0);
-            chartSeriesController_ph?.updateDataSource(
-              removedDataIndex: 0,
-            );
-          }
+        while (phGraphData.length > 10) {
+          phGraphData.removeAt(0);
+          chartSeriesController_ph?.updateDataSource(
+            removedDataIndex: 0,
+          );
         }
         setState(() {
           currentPHLevel = phGraphData[phGraphData.length - 1].value.toString();
@@ -126,13 +124,11 @@ class _DashboardPageState extends State<DashboardPage> {
           });
         }
       }
-      if (tempGraphData.length > 10) {
-        while (tempGraphData.length > 10) {
-          tempGraphData.removeAt(0);
-          chartSeriesController_temp?.updateDataSource(
-            removedDataIndex: 0,
-          );
-        }
+      while (tempGraphData.length > 10) {
+        tempGraphData.removeAt(0);
+        chartSeriesController_temp?.updateDataSource(
+          removedDataIndex: 0,
+        );
       }
     }
   }
