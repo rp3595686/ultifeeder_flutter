@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-Map<String, int> configdataFromJson(String str) =>
-    Map.from(json.decode(str)).map((k, v) => MapEntry<String, int>(k, (v)));
-
 Map<String, GraphData> graphdataFromJson(String str) =>
     Map.from(json.decode(str))
         .map((k, v) => MapEntry<String, GraphData>(k, GraphData.fromJson(v)));

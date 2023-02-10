@@ -12,7 +12,12 @@ import 'graph.dart';
 import 'json_convert.dart';
 import 'page_scaffold.dart';
 
+List<String> sensorList = [];
 bool timer_isRunning = true;
+String dataStoragePath = "/DataStorage";
+String sensorPath = '';
+String phDataPath = "/data/ph";
+String tempDataPath = "/data/temp";
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -23,16 +28,17 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   String currentPHLevel = '0', currentTempLevel = '0';
-  Timer? timer_ph, timer_temp;
+  Timer? timer_ph, timer_temp, timer_sensor;
 
   final firebase_ref = firebaseDB.ref();
   Future fetchData_ph(Timer timer_ph) async {
     if (!timer_isRunning) {
-      // cancel the timer
-      timer_ph.cancel();
+      timer_ph.cancel(); // cancel the timer
+      return; //exit
     }
+    String phFetchPath = "${dataStoragePath}/${sensorPath}/${phDataPath}";
     DataSnapshot snapshot_ph =
-        await firebase_ref.child('ph/').limitToLast(10).get();
+        await firebase_ref.child(phFetchPath).limitToLast(10).get();
     if (snapshot_ph.exists) {
       final jsonResponse_ph = json.encode(snapshot_ph.value);
       final Response_ph = graphdataFromJson(jsonResponse_ph);
@@ -73,20 +79,25 @@ class _DashboardPageState extends State<DashboardPage> {
             removedDataIndex: 0,
           );
         }
-        setState(() {
-          currentPHLevel = phGraphData[phGraphData.length - 1].value.toString();
-        });
+        if (timer_isRunning) {
+          // prevent setState being called after dispose
+          setState(() {
+            currentPHLevel =
+                phGraphData[phGraphData.length - 1].value.toString();
+          });
+        }
       }
     }
   }
 
   Future fetchData_temp(Timer timer_temp) async {
     if (!timer_isRunning) {
-      // cancel the timer
-      timer_temp.cancel();
+      timer_temp.cancel(); // cancel the timer
+      return; // exit
     }
+    String tempFetchPath = "${dataStoragePath}/${sensorPath}/${tempDataPath}";
     DataSnapshot snapshot_temp =
-        await firebase_ref.child('temp/').limitToLast(10).get();
+        await firebase_ref.child(tempFetchPath).limitToLast(10).get();
     if (snapshot_temp.exists) {
       final jsonResponse_temp = json.encode(snapshot_temp.value);
       final Response_temp = graphdataFromJson(jsonResponse_temp);
@@ -118,10 +129,13 @@ class _DashboardPageState extends State<DashboardPage> {
               addedDataIndex: tempGraphData.length - 1,
             );
           }
-          setState(() {
-            currentTempLevel =
-                tempGraphData[tempGraphData.length - 1].value.toString();
-          });
+          if (timer_isRunning) {
+            // prevent setState being called after dispose
+            setState(() {
+              currentTempLevel =
+                  tempGraphData[tempGraphData.length - 1].value.toString();
+            });
+          }
         }
       }
       while (tempGraphData.length > 10) {
@@ -130,6 +144,25 @@ class _DashboardPageState extends State<DashboardPage> {
           removedDataIndex: 0,
         );
       }
+    }
+  }
+
+  Future fetchSensor(Timer timer_sensor) async {
+    if (!timer_isRunning) {
+      timer_sensor.cancel(); // cancel the timer
+      return; // exit
+    }
+    DataSnapshot snapshot_sensor =
+        await firebase_ref.child(dataStoragePath).get();
+    if (snapshot_sensor.exists) {
+      final jsonResponse_sensor = json.encode(snapshot_sensor.value);
+      final Response_sensor = jsonDecode(jsonResponse_sensor);
+      if (sensorList.isEmpty) {
+        // first time initialise
+        sensorList = Response_sensor.keys.toList();
+        sensorPath = sensorList[0];
+      }
+      sensorList = Response_sensor.keys.toList();
     }
   }
 
@@ -150,7 +183,8 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     fetchConfig();
     timer_ph = Timer.periodic(Duration(seconds: phInterval), fetchData_ph);
-    timer_temp = Timer.periodic(const Duration(seconds: 5), fetchData_temp);
+    timer_temp = Timer.periodic(Duration(seconds: 5), fetchData_temp);
+    timer_sensor = Timer.periodic(Duration(seconds: 5), fetchSensor);
     super.initState();
   }
 
