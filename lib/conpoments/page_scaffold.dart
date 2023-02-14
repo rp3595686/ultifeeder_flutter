@@ -48,18 +48,18 @@ class PageScaffold extends StatelessWidget {
               ),
               DropdownButtonHideUnderline(
                 child: DropdownButton(
-                  items:
-                      sensorList.map<DropdownMenuItem<String>>((String value) {
+                  items: feederIDList
+                      .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
                       alignment: Alignment.center,
                     );
                   }).toList(),
-                  value: sensorPath,
+                  value: selectedChipID,
                   onChanged: (Object? value) {
                     ancestorScaffold?.setState(() {
-                      sensorPath = value.toString();
+                      selectedChipID = value.toString();
                     });
                   },
                   style: TextStyle(

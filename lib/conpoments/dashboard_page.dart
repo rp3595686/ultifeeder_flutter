@@ -12,10 +12,13 @@ import 'graph.dart';
 import 'json_convert.dart';
 import 'page_scaffold.dart';
 
-List<String> sensorList = [];
+List<String> feederIDList = [];
+List<String> errorList = [];
 bool timer_isRunning = true;
+String configPath = "/Config";
+String errorPath = "/Error";
 String dataStoragePath = "/DataStorage";
-String sensorPath = '';
+String selectedChipID = '';
 String phDataPath = "/data/ph";
 String tempDataPath = "/data/temp";
 
@@ -36,9 +39,10 @@ class _DashboardPageState extends State<DashboardPage> {
       timer_ph.cancel(); // cancel the timer
       return; //exit
     }
-    String phFetchPath = "${dataStoragePath}/${sensorPath}/${phDataPath}";
-    DataSnapshot snapshot_ph =
-        await firebase_ref.child(phFetchPath).limitToLast(10).get();
+    DataSnapshot snapshot_ph = await firebase_ref
+        .child("$dataStoragePath/$selectedChipID/$phDataPath")
+        .limitToLast(10)
+        .get();
     if (snapshot_ph.exists) {
       final jsonResponse_ph = json.encode(snapshot_ph.value);
       final Response_ph = graphdataFromJson(jsonResponse_ph);
@@ -49,9 +53,13 @@ class _DashboardPageState extends State<DashboardPage> {
           DateTime time = data.time;
           double value = data.value;
           phGraphData.add(GraphData(time: time, value: value));
-          setState(() {});
-          //chartSeriesController_ph?.updateDataSource(
-          //    addedDataIndexes: <int>[phGraphData.length - 1]);
+        }
+        if (timer_isRunning) {
+          // prevent setState being called after dispose
+          setState(() {
+            currentPHLevel =
+                phGraphData[phGraphData.length - 1].value.toString();
+          });
         }
       } else {
         for (var data in Response_ph.values) {
@@ -95,9 +103,10 @@ class _DashboardPageState extends State<DashboardPage> {
       timer_temp.cancel(); // cancel the timer
       return; // exit
     }
-    String tempFetchPath = "${dataStoragePath}/${sensorPath}/${tempDataPath}";
-    DataSnapshot snapshot_temp =
-        await firebase_ref.child(tempFetchPath).limitToLast(10).get();
+    DataSnapshot snapshot_temp = await firebase_ref
+        .child("$dataStoragePath/$selectedChipID/$tempDataPath")
+        .limitToLast(10)
+        .get();
     if (snapshot_temp.exists) {
       final jsonResponse_temp = json.encode(snapshot_temp.value);
       final Response_temp = graphdataFromJson(jsonResponse_temp);
@@ -108,7 +117,13 @@ class _DashboardPageState extends State<DashboardPage> {
           DateTime time = data.time;
           double value = data.value;
           tempGraphData.add(GraphData(time: time, value: value));
-          setState(() {});
+        }
+        if (timer_isRunning) {
+          // prevent setState being called after dispose
+          setState(() {
+            currentTempLevel =
+                tempGraphData[tempGraphData.length - 1].value.toString();
+          });
         }
       } else {
         for (var data in Response_temp.values) {
@@ -147,44 +162,96 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Future fetchSensor(Timer timer_sensor) async {
+  /*Future fetchError(Timer timer_error) async {
     if (!timer_isRunning) {
-      timer_sensor.cancel(); // cancel the timer
+      timer_error.cancel(); // cancel the timer
       return; // exit
     }
-    DataSnapshot snapshot_sensor =
-        await firebase_ref.child(dataStoragePath).get();
-    if (snapshot_sensor.exists) {
-      final jsonResponse_sensor = json.encode(snapshot_sensor.value);
-      final Response_sensor = jsonDecode(jsonResponse_sensor);
-      if (sensorList.isEmpty) {
-        // first time initialise
-        sensorList = Response_sensor.keys.toList();
-        sensorPath = sensorList[0];
+    DataSnapshot snapshot_error = await firebase_ref
+        .child("$errorPath/$selectedChipID")
+        .limitToLast(50)
+        .get();
+    if (snapshot_error.exists) {
+      final jsonResponse_error = json.encode(snapshot_error.value);
+      //final Response_error = jsonDecode(jsonResponse_error);
+      final Response_error = errordataFromJson(jsonResponse_error);
+      print(Response_error);
+
+      if (errorList.isEmpty) {
+        //Add all data
+        //for (var data in Response_error.values) {
+        //print(data);
+        //tempGraphData.add(GraphData(time: time, value: value));
+        //}
+        /*if (timer_isRunning) {
+          // prevent setState being called after dispose
+          setState(() {
+            currentTempLevel =
+                tempGraphData[tempGraphData.length - 1].value.toString();
+          });
+        }*/
+      } /*else {
+        for (var data in Response_temp.values) {
+          DateTime time = data.time;
+          double value = data.value;
+          bool isExist = false;
+
+          //Check if exist
+          for (var a in tempGraphData) {
+            if (a.time == time) {
+              isExist = true;
+              break;
+            }
+          }
+          if (isExist == false) {
+            tempGraphData.add(GraphData(time: time, value: value));
+            chartSeriesController_temp?.updateDataSource(
+              addedDataIndex: tempGraphData.length - 1,
+            );
+          }
+          if (timer_isRunning) {
+            // prevent setState being called after dispose
+            setState(() {
+              currentTempLevel =
+                  tempGraphData[tempGraphData.length - 1].value.toString();
+            });
+          }
+        }
       }
-      sensorList = Response_sensor.keys.toList();
+      while (tempGraphData.length > 10) {
+        tempGraphData.removeAt(0);
+        chartSeriesController_temp?.updateDataSource(
+          removedDataIndex: 0,
+        );
+      }*/
     }
-  }
+  }*/
 
-  Future fetchConfig() async {
-    DataSnapshot snapshot_config = await firebase_ref.child('config/').get();
-    if (snapshot_config.exists) {
-      final jsonResponse_config = json.encode(snapshot_config.value);
-
-      var configData = jsonDecode(jsonResponse_config);
-      phInterval = configData['phInterval'];
-      phInterval_temporary = configData['phInterval'].toString();
-      tempInterval = configData['tempInterval'];
-      tempInterval_temporary = configData['tempInterval'].toString();
+  Future fetchFeederID(Timer timer_feeder) async {
+    if (!timer_isRunning) {
+      timer_feeder.cancel(); // cancel the timer
+      return; // exit
+    }
+    DataSnapshot snapshot_feederID = await firebase_ref.child(configPath).get();
+    if (snapshot_feederID.exists) {
+      final jsonResponse_feederID = json.encode(snapshot_feederID.value);
+      final Response_feederID = jsonDecode(jsonResponse_feederID);
+      if (feederIDList.isEmpty) {
+        // first time initialise
+        feederIDList = Response_feederID.keys.toList();
+        selectedChipID = feederIDList[0];
+      }
+      feederIDList = Response_feederID.keys.toList();
     }
   }
 
   @override
   void initState() {
-    fetchConfig();
-    timer_ph = Timer.periodic(Duration(seconds: phInterval), fetchData_ph);
+    timer_ph =
+        Timer.periodic(Duration(milliseconds: updatePhInterval), fetchData_ph);
     timer_temp = Timer.periodic(Duration(seconds: 5), fetchData_temp);
-    timer_sensor = Timer.periodic(Duration(seconds: 5), fetchSensor);
+    timer_sensor = Timer.periodic(Duration(seconds: 5), fetchFeederID);
+    //timer_error = Timer.periodic(Duration(seconds: 5), fetchError);
     super.initState();
   }
 
@@ -220,7 +287,9 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return DashboardSensorDetail(
+        currentPHLevel: currentPHLevel, currentTempLevel: currentTempLevel);
+    /*Row(
       children: [
         Responsive(
           mobile: Expanded(
@@ -246,7 +315,7 @@ class Dashboard extends StatelessWidget {
                 currentTempLevel: currentTempLevel),
           ),
       ],
-    );
+    );*/
   }
 }
 
