@@ -79,7 +79,7 @@ class Graph extends StatelessWidget {
               ),
               // Initialize category axis
               primaryXAxis: DateTimeAxis(),
-              primaryYAxis: NumericAxis(minimum: 0, maximum: 30),
+              primaryYAxis: NumericAxis(minimum: 0, maximum: 40),
               //tooltipBehavior: TooltipBehavior(enable: true),
 
               /// To set the track ball as true and customized trackball behaviour.
