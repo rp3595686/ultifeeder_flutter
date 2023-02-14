@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:utifeeder_flutter/conpoments/page_scaffold.dart';
 
-import '../firebase_fetch.dart';
+import '../main.dart';
 import 'dashboard_page.dart';
 
 class SettingPage extends StatefulWidget {
@@ -72,6 +72,7 @@ class _SettingPageState extends State<SettingPage> {
   String selectedChipID_prev = '';
   Timer? timer_checkChipIDChange;
   Future checkChipIDChange(Timer timer_checkChipIDChange) async {
+    // refresh widget when chipID is being changed
     if (selectedChipID_prev != selectedChipID) {
       setState(() {
         selectedChipID_prev = selectedChipID;
@@ -162,7 +163,8 @@ class _SettingPageState extends State<SettingPage> {
                         controller: readPhIntervalField,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter
+                              .digitsOnly, // allow only numbers
                         ],
                         onChanged: (value) {
                           readPhInterval = value;
@@ -219,23 +221,19 @@ class _SettingPageState extends State<SettingPage> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
+                    // if any field left blank
                     if (updatePhInterval_temporary == '' ||
                         updateTempInterval_temporary == '' ||
                         readPhInterval == '' ||
                         readTempInterval == '' ||
                         feedInterval == '') {
+                      // show snack bar
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text('Please filled in all blanks')));
                     } else {
                       updatePhInterval = int.parse(updatePhInterval_temporary);
                       updateTempInterval =
                           int.parse(updateTempInterval_temporary);
-
-                      // Save Monitoring Settings to Firebase
-                      /*firebase_ref.child(configPath).set({
-                        "updatePhInterval": updatePhInterval,
-                        "updateTempInterval": updateTempInterval
-                      });*/
 
                       // Save Ultifeeder Settings to Firebase
                       firebase_ref.child("$configPath/$selectedChipID").set({

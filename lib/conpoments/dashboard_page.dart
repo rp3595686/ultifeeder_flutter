@@ -7,7 +7,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:utifeeder_flutter/conpoments/setting_page.dart';
 
 import '../main.dart';
-import '../responsive.dart';
 import 'graph.dart';
 import 'json_convert.dart';
 import 'page_scaffold.dart';
@@ -31,22 +30,26 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   String currentPHLevel = '0', currentTempLevel = '0';
-  Timer? timer_ph, timer_temp, timer_sensor;
+  Timer? timer_ph, timer_temp, timer_getChipID;
 
-  final firebase_ref = firebaseDB.ref();
   Future fetchData_ph(Timer timer_ph) async {
     if (!timer_isRunning) {
       timer_ph.cancel(); // cancel the timer
       return; //exit
     }
+
+    // get the last 10 data
     DataSnapshot snapshot_ph = await firebase_ref
         .child("$dataStoragePath/$selectedChipID/$phDataPath")
         .limitToLast(10)
         .get();
+
+    // if successfully receive data
     if (snapshot_ph.exists) {
       final jsonResponse_ph = json.encode(snapshot_ph.value);
       final Response_ph = graphdataFromJson(jsonResponse_ph);
 
+      // if local phGraphData List is empty
       if (phGraphData.isEmpty) {
         //Add all data
         for (var data in Response_ph.values) {
@@ -62,6 +65,7 @@ class _DashboardPageState extends State<DashboardPage> {
           });
         }
       } else {
+        // Add value one by one
         for (var data in Response_ph.values) {
           DateTime time = data.time;
           double value = data.value;
@@ -81,6 +85,8 @@ class _DashboardPageState extends State<DashboardPage> {
             );
           }
         }
+
+        // while phGraphData List has more than 10 elements
         while (phGraphData.length > 10) {
           phGraphData.removeAt(0);
           chartSeriesController_ph?.updateDataSource(
@@ -103,10 +109,14 @@ class _DashboardPageState extends State<DashboardPage> {
       timer_temp.cancel(); // cancel the timer
       return; // exit
     }
+
+    // get the last 10 data
     DataSnapshot snapshot_temp = await firebase_ref
         .child("$dataStoragePath/$selectedChipID/$tempDataPath")
         .limitToLast(10)
         .get();
+
+    // if successfully receive data
     if (snapshot_temp.exists) {
       final jsonResponse_temp = json.encode(snapshot_temp.value);
       final Response_temp = graphdataFromJson(jsonResponse_temp);
@@ -126,6 +136,7 @@ class _DashboardPageState extends State<DashboardPage> {
           });
         }
       } else {
+        // Add value one by one
         for (var data in Response_temp.values) {
           DateTime time = data.time;
           double value = data.value;
@@ -153,6 +164,7 @@ class _DashboardPageState extends State<DashboardPage> {
           }
         }
       }
+      // while tempGraphData List has more than 10 elements
       while (tempGraphData.length > 10) {
         tempGraphData.removeAt(0);
         chartSeriesController_temp?.updateDataSource(
@@ -162,6 +174,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  // fetching error message (partially implemented)
   /*Future fetchError(Timer timer_error) async {
     if (!timer_isRunning) {
       timer_error.cancel(); // cancel the timer
@@ -227,9 +240,9 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }*/
 
-  Future fetchFeederID(Timer timer_feeder) async {
+  Future fetchFeederID(Timer timer_getChipID) async {
     if (!timer_isRunning) {
-      timer_feeder.cancel(); // cancel the timer
+      timer_getChipID.cancel(); // cancel the timer
       return; // exit
     }
     DataSnapshot snapshot_feederID = await firebase_ref.child(configPath).get();
@@ -249,16 +262,17 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     timer_ph =
         Timer.periodic(Duration(milliseconds: updatePhInterval), fetchData_ph);
-    timer_temp = Timer.periodic(Duration(seconds: 5), fetchData_temp);
-    timer_sensor = Timer.periodic(Duration(seconds: 5), fetchFeederID);
-    //timer_error = Timer.periodic(Duration(seconds: 5), fetchError);
+    timer_temp = Timer.periodic(
+        Duration(milliseconds: updateTempInterval), fetchData_temp);
+    timer_getChipID = Timer.periodic(Duration(seconds: 5), fetchFeederID);
+    //timer_error = Timer.periodic(Duration(seconds: 5), fetchError); // fetching error message (partially implemented)
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: Responsive.isDesktop(context) ? '' : 'Ultifeeder',
+      title: '', // Left blank as it will coincide with other widget,
       body: SafeArea(
         child: Row(
           children: [
@@ -289,6 +303,8 @@ class Dashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DashboardSensorDetail(
         currentPHLevel: currentPHLevel, currentTempLevel: currentTempLevel);
+
+    // Responsive Layout with Error message (partially implemented)
     /*Row(
       children: [
         Responsive(
@@ -319,8 +335,8 @@ class Dashboard extends StatelessWidget {
   }
 }
 
-class DashboardMessage extends StatelessWidget {
-  const DashboardMessage({
+class ErrorMessage extends StatelessWidget {
+  const ErrorMessage({
     Key? key,
   }) : super(key: key);
 
@@ -330,7 +346,7 @@ class DashboardMessage extends StatelessWidget {
       child: ListView.separated(
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text('Everything is OK :)'),
+            title: Text('Error Message test'),
           );
         },
         separatorBuilder: (BuildContext context, int index) {
@@ -363,7 +379,7 @@ class DashboardSensorDetail extends StatelessWidget {
                 child: Card(
                   elevation: 5,
                   child: FittedBox(
-                    fit: BoxFit.scaleDown,
+                    fit: BoxFit.fitHeight,
                     child: Container(
                       padding: EdgeInsets.symmetric(),
                       child: Column(
@@ -391,7 +407,7 @@ class DashboardSensorDetail extends StatelessWidget {
                 child: Card(
                   elevation: 5,
                   child: FittedBox(
-                    fit: BoxFit.scaleDown,
+                    fit: BoxFit.fitHeight,
                     child: Column(
                       children: [
                         Text(

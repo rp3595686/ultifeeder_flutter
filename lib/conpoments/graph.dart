@@ -28,7 +28,6 @@ class Graph extends StatelessWidget {
               // Initialize category axis
               primaryXAxis: DateTimeAxis(),
               primaryYAxis: NumericAxis(minimum: 0, maximum: 14),
-              //tooltipBehavior: TooltipBehavior(enable: true),
 
               /// To set the track ball as true and customized trackball behaviour.
               trackballBehavior: TrackballBehavior(
@@ -41,12 +40,6 @@ class Graph extends StatelessWidget {
                 ),
                 activationMode: ActivationMode.singleTap,
                 tooltipDisplayMode: TrackballDisplayMode.floatAllPoints,
-                /*tooltipSettings: InteractiveTooltip(
-                    format: TrackballDisplayMode.floatAllPoints !=
-                            TrackballDisplayMode.groupAllPoints
-                        ? 'series.name : point.y'
-                        : null,
-                  ),*/
               ),
               series: <SplineSeries<GraphData, DateTime>>[
                 SplineSeries<GraphData, DateTime>(
@@ -56,9 +49,6 @@ class Graph extends StatelessWidget {
                   xValueMapper: (GraphData data, _) => data.time,
                   yValueMapper: (GraphData data, _) =>
                       data.value, // Enable data label
-                  //dataLabelSettings: DataLabelSettings(isVisible: true),
-                  // Renders the marker
-                  //markerSettings: MarkerSettings(isVisible: true),
                   onRendererCreated: (ChartSeriesController controller) {
                     chartSeriesController_ph = controller;
                   },
@@ -80,7 +70,6 @@ class Graph extends StatelessWidget {
               // Initialize category axis
               primaryXAxis: DateTimeAxis(),
               primaryYAxis: NumericAxis(minimum: 0, maximum: 40),
-              //tooltipBehavior: TooltipBehavior(enable: true),
 
               /// To set the track ball as true and customized trackball behaviour.
               trackballBehavior: TrackballBehavior(
@@ -93,12 +82,6 @@ class Graph extends StatelessWidget {
                 ),
                 activationMode: ActivationMode.singleTap,
                 tooltipDisplayMode: TrackballDisplayMode.floatAllPoints,
-                /*tooltipSettings: InteractiveTooltip(
-                    format: TrackballDisplayMode.floatAllPoints !=
-                            TrackballDisplayMode.groupAllPoints
-                        ? 'series.name : point.y'
-                        : null,
-                  ),*/
               ),
               series: <SplineSeries<GraphData, DateTime>>[
                 SplineSeries<GraphData, DateTime>(
@@ -109,9 +92,6 @@ class Graph extends StatelessWidget {
                   xValueMapper: (GraphData data, _) => data.time,
                   yValueMapper: (GraphData data, _) =>
                       data.value, // Enable data label
-                  //dataLabelSettings: DataLabelSettings(isVisible: true),
-                  // Renders the marker
-                  //markerSettings: MarkerSettings(isVisible: true),
                   onRendererCreated: (ChartSeriesController controller) {
                     chartSeriesController_temp = controller;
                   },

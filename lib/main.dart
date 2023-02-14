@@ -9,6 +9,7 @@ import 'conpoments/split_view.dart';
 import 'firebase_options.dart';
 
 var firebaseDB;
+final firebase_ref = firebaseDB.ref();
 ChartSeriesController? chartSeriesController_ph, chartSeriesController_temp;
 
 void main() async {

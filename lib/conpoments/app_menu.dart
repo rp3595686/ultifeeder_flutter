@@ -63,18 +63,6 @@ class AppMenu extends ConsumerWidget {
                 ],
               ),
             ),
-            /*Expanded(
-              child: ListView(
-                // Note: use ListView.builder if there are many items
-                children: <Widget>[
-                  // iterate through the keys to get the page names
-                  Container(
-                    height: 10,
-                    color: Colors.blue,
-                  )
-                ],
-              ),
-            ),*/
             ListTile(
               onTap: () {
                 _selectPage(context, ref, 'Dashboard');
@@ -94,9 +82,6 @@ class AppMenu extends ConsumerWidget {
                 _selectPage(context, ref, 'Setting');
                 timer_isRunning = false;
               },
-              /*leading: Image.asset(
-                "web/icons/Icon-192.png",
-              ),*/
               title: Text(
                 "Settings",
                 style: TextStyle(
